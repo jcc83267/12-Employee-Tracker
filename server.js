@@ -2,6 +2,9 @@ const inquirer = require('inquirer');
 const mysql2 = require('mysql2');
 const cTable = require('console.table');
 
+let departmentArr = [];
+let index = -1;
+
 //connetion setup
 const connection = mysql2.createConnection({
     host: 'localhost',
@@ -51,6 +54,9 @@ function mainMenu() {
                 break;
             case "add a department":
                 addDepartment();
+                break;
+            case "add a role":
+                makeDepartmentArr();
                 break;
             case "end session":
                 connection.end();
@@ -151,8 +157,74 @@ function addDepartment() {
             function (err, res) {
                 if (err) throw err;
                 console.log(res.affectedRows + ' Department inserted!\n');
+                departmentArr = [];
                 backMenu();
             }
         );
     })
 }
+
+function makeDepartmentArr() {
+    connection.query(
+        'SELECT * FROM department',
+        function (err, results) {
+            if (err) throw err;
+            results.forEach(element => {
+                departmentArr.push(element.name);
+            });
+            addRole();
+        }
+    )
+}
+
+function indexFinder(departmentName) {
+    console.log(departmentArr)
+    console.log(departmentArr.length)
+    for (let i = 0; i < departmentArr.length; i++) {
+        console.log("index = " + i)
+        if (departmentArr[i] === departmentName) {
+            index = i;
+            console.log(index)
+        }
+    }
+     return index + 1;
+}
+
+function addRole() {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'What is the name of the role',
+            name: 'roleName'
+        },
+        {
+            type: 'number',
+            message: 'What is the salary',
+            name: 'salary'
+        },
+        {
+            type: 'list',
+            message: 'Under which department is this role?',
+            name: 'department',
+            choices: departmentArr
+        }
+    ]).then(({ roleName, salary, department }) => {
+        index = indexFinder(department)
+        console.log(roleName, salary, department, index)
+        connection.query(
+            'INSERT INTO role SET ?',
+            {
+                title: roleName,
+                salary: salary,
+                department_id: index
+            },
+            function (err, res) {
+                if (err) throw err;
+                console.log(res.affectedRows + ' Role inserted!\n');
+                backMenu();
+            }
+        );
+    })
+}
+
+
