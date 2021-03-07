@@ -3,7 +3,63 @@ const mysql2 = require('mysql2');
 const cTable = require('console.table');
 
 let departmentArr = [];
-let index = -1;
+let employeeArr = [];
+let roleArr = [];
+
+//function to make array
+function makeDepartmentArr() {
+    departmentArr = [];
+    connection.query(
+        'SELECT * FROM department',
+        function (err, results) {
+            if (err) throw err;
+            results.forEach(element => {
+                departmentArr.push(element.name);
+            });
+            return;
+        }
+    )
+}
+
+function makeEmployeeArr() {
+    employeeArr = [];
+    connection.query(
+        'SELECT * FROM employee',
+        function (err, results) {
+            if (err) throw err;
+            results.forEach(element => {
+                let name = element.first_name + " " + element.last_name;
+                employeeArr.push(name);
+            });
+            return;
+        }
+    )
+}
+
+function makeRoleArr() {
+    roleArr = [];
+    connection.query(
+        'SELECT * FROM role',
+        function (err, results) {
+            if (err) throw err;
+            results.forEach(element => {
+                roleArr.push(element.title);
+            });
+            return;
+        }
+    )
+}
+
+//function to count index placement
+function indexFinder( matchName, arrayName ) {
+    let index = -1;
+    for (let i = 0; i < arrayName.length; i++) {
+        if (arrayName[i] === matchName) {
+            index = i + 1;
+        }
+    }
+    return index;
+}
 
 //connetion setup
 const connection = mysql2.createConnection({
@@ -56,7 +112,13 @@ function mainMenu() {
                 addDepartment();
                 break;
             case "add a role":
-                makeDepartmentArr();
+                addRole();
+                break;
+            case "add an employee":
+                addEmployee();
+                break;
+            case "update an employee role":
+                updateEmployee();
                 break;
             case "end session":
                 connection.end();
@@ -93,14 +155,13 @@ function backMenu() {
 //view all departmennts
 function viewAllDepartments() {
     connection.query(
-        'SELECT * FROM department',
+        'SELECT * FROM department ORDER BY d_id ASC;',
         function (err, results) {
             if (err) throw err;
             console.table(results);
             backMenu()
         }
     );
-
 }
 
 //view all roles
@@ -110,6 +171,7 @@ function viewAllRoles() {
         FROM role
         INNER JOIN department
         ON role.department_id = department.d_id;
+        ORDER BY r_id ASC;
         `,
         function (err, results) {
             if (err) throw err;
@@ -164,33 +226,8 @@ function addDepartment() {
     })
 }
 
-function makeDepartmentArr() {
-    connection.query(
-        'SELECT * FROM department',
-        function (err, results) {
-            if (err) throw err;
-            results.forEach(element => {
-                departmentArr.push(element.name);
-            });
-            addRole();
-        }
-    )
-}
-
-function indexFinder(departmentName) {
-    console.log(departmentArr)
-    console.log(departmentArr.length)
-    for (let i = 0; i < departmentArr.length; i++) {
-        console.log("index = " + i)
-        if (departmentArr[i] === departmentName) {
-            index = i;
-            console.log(index)
-        }
-    }
-     return index + 1;
-}
-
 function addRole() {
+    makeDepartmentArr();
     inquirer.prompt([
         {
             type: 'input',
@@ -209,7 +246,7 @@ function addRole() {
             choices: departmentArr
         }
     ]).then(({ roleName, salary, department }) => {
-        index = indexFinder(department)
+         let index = indexFinder(department, departmentArr);
         console.log(roleName, salary, department, index)
         connection.query(
             'INSERT INTO role SET ?',
@@ -227,4 +264,53 @@ function addRole() {
     })
 }
 
+function addEmployee() {
+    makeEmployeeArr();
+    makeRoleArr;
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: "What is the employee's first name?",
+            name: 'firstName'
+        },
+        {
+            type: 'input',
+            message: "What is the employee's last name?",
+            name: 'lastName'
+        },
+        {
+            type: 'list',
+            message: "What is the employee's title?",
+            name: 'title',
+            choices: roleArr
+        },
+        {
+            type: 'list',
+            message: "Who is the employee's manager?",
+            name: 'manager',
+            choices: employeeArr
+        }
+    ]).then(({ firstName, lastName, title, manager }) => {
+        let index = indexFinder(title, roleArr);
+        let index2 = indexFinder(manager, employeeArr);
+        console.log(firstName, lastName, title, manager, index, index2)
+        connection.query(
+            'INSERT INTO employee SET ?',
+            {
+                first_name: firstName,
+                last_name: lastName,
+                role_id: index,
+                manager_id: index2
+            },
+            function (err, res) {
+                if (err) throw err;
+                console.log(res.affectedRows + ' Employee inserted!\n');
+                backMenu();
+            }
+        );
+    })
+}
+//THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
+function updateEmployee() {
 
+}
