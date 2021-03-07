@@ -10,7 +10,7 @@ let roleArr = [];
 function makeDepartmentArr() {
     departmentArr = [];
     connection.query(
-        'SELECT * FROM department',
+        'SELECT * FROM department ORDER BY d_id ASC',
         function (err, results) {
             if (err) throw err;
             results.forEach(element => {
@@ -24,7 +24,7 @@ function makeDepartmentArr() {
 function makeEmployeeArr() {
     employeeArr = [];
     connection.query(
-        'SELECT * FROM employee',
+        'SELECT * FROM employee ORDER BY e_id ASC',
         function (err, results) {
             if (err) throw err;
             results.forEach(element => {
@@ -39,7 +39,7 @@ function makeEmployeeArr() {
 function makeRoleArr() {
     roleArr = [];
     connection.query(
-        'SELECT * FROM role',
+        'SELECT * FROM role ORDER BY r_id ASC' ,
         function (err, results) {
             if (err) throw err;
             results.forEach(element => {
@@ -50,6 +50,7 @@ function makeRoleArr() {
     )
 }
 //function to make array end;
+
 //function to count index placement
 function indexFinder(matchName, arrayName) {
     let index = -1;
@@ -173,7 +174,7 @@ function viewAllRoles() {
         `SELECT r_id AS role_id, title AS job_title, name AS department_name, salary 
         FROM role
         INNER JOIN department
-        ON role.department_id = department.d_id;
+        ON role.department_id = department.d_id
         ORDER BY r_id ASC;
         `,
         function (err, results) {
