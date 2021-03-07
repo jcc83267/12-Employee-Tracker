@@ -49,9 +49,9 @@ function makeRoleArr() {
         }
     )
 }
-
+//function to make array end;
 //function to count index placement
-function indexFinder( matchName, arrayName ) {
+function indexFinder(matchName, arrayName) {
     let index = -1;
     for (let i = 0; i < arrayName.length; i++) {
         if (arrayName[i] === matchName) {
@@ -80,6 +80,9 @@ connection.connect(err => {
 
 // main menu prompt list of action
 function mainMenu() {
+    makeDepartmentArr();
+    makeRoleArr();
+    makeEmployeeArr();
     inquirer.prompt([
         {
             type: 'list',
@@ -185,8 +188,8 @@ function viewAllRoles() {
 function viewAllEmployees() {
     connection.query(
         `SELECT 
-        e_id, first_name, last_name,
-        title, name, salary, manager_id,  CONCAT(first_name, ' ',last_name) AS Manager
+        e_id AS ID, first_name, last_name,
+        title AS job_title, name AS department_name, salary, manager_id,  CONCAT(first_name, ' ',last_name) AS Manager
         FROM employee
         INNER JOIN role
         ON employee.role_id = role.r_id
@@ -227,7 +230,6 @@ function addDepartment() {
 }
 
 function addRole() {
-    makeDepartmentArr();
     inquirer.prompt([
         {
             type: 'input',
@@ -246,7 +248,7 @@ function addRole() {
             choices: departmentArr
         }
     ]).then(({ roleName, salary, department }) => {
-         let index = indexFinder(department, departmentArr);
+        let index = indexFinder(department, departmentArr);
         console.log(roleName, salary, department, index)
         connection.query(
             'INSERT INTO role SET ?',
@@ -265,8 +267,6 @@ function addRole() {
 }
 
 function addEmployee() {
-    makeEmployeeArr();
-    makeRoleArr;
     inquirer.prompt([
         {
             type: 'input',
@@ -310,7 +310,38 @@ function addEmployee() {
         );
     })
 }
-//THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
-function updateEmployee() {
 
+function updateEmployee() {
+    inquirer.prompt([
+        {
+            type: 'list',
+            message: "Which Employee would you like to edit?",
+            name: 'employee',
+            choices: employeeArr
+        },
+        {
+            type: 'list',
+            message: "What is the employee's new title?",
+            name: 'title',
+            choices: roleArr
+        }
+    ]).then(({ employee, title }) => {
+        let index = indexFinder(employee, employeeArr);
+        let index2 = indexFinder(title, roleArr);
+        console.log(employee, title, index)
+        connection.query(
+            'UPDATE employee SET ? WHERE ?',
+            [{
+                role_id: index2
+            },
+            {
+                e_id: index
+            }],
+            function (err, res) {
+                if (err) throw err;
+                console.log(res.affectedRows + ' Role updated!\n');
+                backMenu();
+            }
+        );
+    })
 }
