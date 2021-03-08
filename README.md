@@ -16,16 +16,18 @@ To create a way to track employees using command line. It will keep track of Dep
 
 ## Screenshot
 Screenshot of when you start the program  
-![screenshot of sample html](./images/screenshot1.jpg) 
+![screenshot of sample html](images/screenshot1.jpg) 
     
 Example Screenshot of viewing all departments     
-![screenshot of sample html](./images/screenshot4.jpg) 
+![screenshot of sample html](images/screenshot4.jpg) 
    
 Example Screenshot of viewing all roles    
-![screenshot of sample html](./images/screenshot3.jpg)  
+![screenshot of sample html](images/screenshot3.jpg)  
   
 Example Screenshot of viewing all employees  
-![screenshot of sample html](./images/screenshot2.jpg)
+![screenshot of sample html](images/screenshot2.jpg)
+
+
   
 
 ## Links
