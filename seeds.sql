@@ -34,20 +34,20 @@ INSERT INTO role (r_id, title, salary, department_id)
 VALUES (7, "Accountant", 125000, 4);
 
 -- employee seeds
-INSERT INTO employee (e_id, first_name, last_name, role_id, manager_id)
-VALUES (1, "John", "Doe", 1, 3);
+INSERT INTO employee (e_id, first_name, last_name, role_id)
+VALUES (1, "John", "Doe", 1);
 
-INSERT INTO employee (e_id, first_name, last_name, role_id, manager_id)
-VALUES (2, "Mike", "Chan", 2, 1);
+INSERT INTO employee (e_id, first_name, last_name, role_id)
+VALUES (2, "Mike", "Chan", 2);
 
 INSERT INTO employee (e_id, first_name, last_name, role_id)
 VALUES (3, "Ashley", "Rodriguez", 5);
 
-INSERT INTO employee (e_id, first_name, last_name, role_id, manager_id)
-VALUES (4, "Kevin", "Lopez", 6, 3);
+INSERT INTO employee (e_id, first_name, last_name, role_id)
+VALUES (4, "Kevin", "Lopez", 6);
 
-INSERT INTO employee (e_id, first_name, last_name, role_id, manager_id)
-VALUES (5, "Julius", "Ochoa", 6, 3);
+INSERT INTO employee (e_id, first_name, last_name, role_id)
+VALUES (5, "Julius", "Ochoa", 6);
 
 INSERT INTO employee (e_id, first_name, last_name, role_id)
 VALUES (6, "Malia", "Brown", 7);
@@ -55,11 +55,40 @@ VALUES (6, "Malia", "Brown", 7);
 INSERT INTO employee (e_id, first_name, last_name, role_id)
 VALUES (7, "Sarah", "Lourd", 3);
 
-INSERT INTO employee (e_id, first_name, last_name, role_id, manager_id)
-VALUES (8, "Tom", "Allen", 4, 7);
+INSERT INTO employee (e_id, first_name, last_name, role_id)
+VALUES (8, "Tom", "Allen", 4);
 
-INSERT INTO employee (e_id, first_name, last_name, role_id, manager_id)
-VALUES (9, "Zak", "Mendoza", 7, 8);
+INSERT INTO employee (e_id, first_name, last_name, role_id)
+VALUES (9, "Zak", "Mendoza", 7);
 
-INSERT INTO employee (e_id, first_name, last_name, role_id, manager_id)
-VALUES (10, "Tammer", "Galal", 6, 3);
+INSERT INTO employee (e_id, first_name, last_name, role_id)
+VALUES (10, "Tammer", "Galal", 6);
+
+-- give some employees there managers
+UPDATE employee SET 
+manager_id = 3
+WHERE e_id = 1;
+
+UPDATE employee SET 
+manager_id = 1
+WHERE e_id = 2;
+
+UPDATE employee SET 
+manager_id = 3
+WHERE e_id = 4;
+
+UPDATE employee SET 
+manager_id = 3
+WHERE e_id = 5;
+
+UPDATE employee SET 
+manager_id = 7
+WHERE e_id = 8;
+
+UPDATE employee SET 
+manager_id = 8
+WHERE e_id = 9;
+
+UPDATE employee SET 
+manager_id = 3
+WHERE e_id = 10;

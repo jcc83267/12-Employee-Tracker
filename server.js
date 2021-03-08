@@ -6,51 +6,6 @@ let departmentArr = [];
 let employeeArr = [];
 let roleArr = [];
 
-//function to make array
-function makeDepartmentArr() {
-    departmentArr = [];
-    connection.query(
-        'SELECT * FROM department ORDER BY d_id ASC',
-        function (err, results) {
-            if (err) throw err;
-            results.forEach(element => {
-                departmentArr.push(element.name);
-            });
-            return;
-        }
-    )
-}
-
-function makeEmployeeArr() {
-    employeeArr = [];
-    connection.query(
-        'SELECT * FROM employee ORDER BY e_id ASC',
-        function (err, results) {
-            if (err) throw err;
-            results.forEach(element => {
-                let name = element.first_name + " " + element.last_name;
-                employeeArr.push(name);
-            });
-            return;
-        }
-    )
-}
-
-function makeRoleArr() {
-    roleArr = [];
-    connection.query(
-        'SELECT * FROM role ORDER BY r_id ASC' ,
-        function (err, results) {
-            if (err) throw err;
-            results.forEach(element => {
-                roleArr.push(element.title);
-            });
-            return;
-        }
-    )
-}
-//function to make array end;
-
 //function to count index placement
 function indexFinder(matchName, arrayName) {
     let index = -1;
@@ -71,10 +26,10 @@ const connection = mysql2.createConnection({
     database: 'employee_DB'
 });
 
+//start connection with main menu
 connection.connect(err => {
     if (err) throw err;
-    console.log("Welcome!")
-    console.log('connected as id ' + connection.threadId + '\n');
+    console.log("EMPLOYEE TRACKER \nWelcome! \nconnected as id"  + connection.threadId + "\n");
     mainMenu();
 });
 //
@@ -101,7 +56,6 @@ function mainMenu() {
             ]
         }
     ]).then(({ action }) => {
-        console.log(action);
         switch (action) {
             case "view all departments":
                 viewAllDepartments();
@@ -144,7 +98,6 @@ function backMenu() {
             ]
         }
     ]).then(({ action }) => {
-        console.log(action);
         switch (action) {
             case "go back to main menu":
                 mainMenu();
@@ -156,14 +109,59 @@ function backMenu() {
     });
 }
 
+//functions to make array based on the tables
+function makeDepartmentArr() {
+    departmentArr = [];
+    connection.query(
+        'SELECT * FROM department ORDER BY d_id ASC',
+        function (err, results) {
+            if (err) throw err;
+            results.forEach(element => {
+                departmentArr.push(element.name);
+            });
+            return;
+        }
+    );
+}
+
+function makeEmployeeArr() {
+    employeeArr = [];
+    connection.query(
+        'SELECT * FROM employee ORDER BY e_id ASC',
+        function (err, results) {
+            if (err) throw err;
+            results.forEach(element => {
+                let name = element.first_name + " " + element.last_name;
+                employeeArr.push(name);
+            });
+            return;
+        }
+    );
+}
+
+function makeRoleArr() {
+    roleArr = [];
+    connection.query(
+        'SELECT * FROM role ORDER BY r_id ASC' ,
+        function (err, results) {
+            if (err) throw err;
+            results.forEach(element => {
+                roleArr.push(element.title);
+            });
+            return;
+        }
+    );
+}
+//function to make array end;
+
 //view all departmennts
 function viewAllDepartments() {
     connection.query(
-        'SELECT * FROM department ORDER BY d_id ASC;',
+        'SELECT d_id AS id, name AS department_name FROM department ORDER BY d_id ASC;',
         function (err, results) {
             if (err) throw err;
             console.table(results);
-            backMenu()
+            backMenu();
         }
     );
 }
@@ -171,7 +169,7 @@ function viewAllDepartments() {
 //view all roles
 function viewAllRoles() {
     connection.query(
-        `SELECT r_id AS role_id, title AS job_title, name AS department_name, salary 
+        `SELECT r_id AS id, title AS job_title, name AS department_name, salary 
         FROM role
         INNER JOIN department
         ON role.department_id = department.d_id
@@ -180,7 +178,7 @@ function viewAllRoles() {
         function (err, results) {
             if (err) throw err;
             console.table(results);
-            backMenu()
+            backMenu();
         }
     );
 }
@@ -188,9 +186,7 @@ function viewAllRoles() {
 //view all roles
 function viewAllEmployees() {
     connection.query(
-        `SELECT 
-        e_id AS ID, first_name, last_name,
-        title AS job_title, name AS department_name, salary, manager_id,  CONCAT(first_name, ' ',last_name) AS Manager
+        `SELECT e_id AS id, first_name, last_name, title AS job_title, name AS department_name, salary, manager_id
         FROM employee
         INNER JOIN role
         ON employee.role_id = role.r_id
@@ -198,11 +194,10 @@ function viewAllEmployees() {
         ON role.department_id = department.d_id
         ORDER BY e_id ASC;
         `,
-        // `SELECT * FROM employee;`,
         function (err, results) {
             if (err) throw err;
             console.table(results);
-            backMenu()
+            backMenu();
         }
     );
 }
@@ -227,7 +222,7 @@ function addDepartment() {
                 backMenu();
             }
         );
-    })
+    });
 }
 
 function addRole() {
@@ -250,7 +245,6 @@ function addRole() {
         }
     ]).then(({ roleName, salary, department }) => {
         let index = indexFinder(department, departmentArr);
-        console.log(roleName, salary, department, index)
         connection.query(
             'INSERT INTO role SET ?',
             {
@@ -260,11 +254,11 @@ function addRole() {
             },
             function (err, res) {
                 if (err) throw err;
-                console.log(res.affectedRows + ' Role inserted!\n');
+                console.log(res.affectedRows + ' Role added!\n');
                 backMenu();
             }
         );
-    })
+    });
 }
 
 function addEmployee() {
@@ -294,7 +288,6 @@ function addEmployee() {
     ]).then(({ firstName, lastName, title, manager }) => {
         let index = indexFinder(title, roleArr);
         let index2 = indexFinder(manager, employeeArr);
-        console.log(firstName, lastName, title, manager, index, index2)
         connection.query(
             'INSERT INTO employee SET ?',
             {
@@ -305,11 +298,11 @@ function addEmployee() {
             },
             function (err, res) {
                 if (err) throw err;
-                console.log(res.affectedRows + ' Employee inserted!\n');
+                console.log(res.affectedRows + ' Employee has been added!\n');
                 backMenu();
             }
         );
-    })
+    });
 }
 
 function updateEmployee() {
@@ -329,7 +322,6 @@ function updateEmployee() {
     ]).then(({ employee, title }) => {
         let index = indexFinder(employee, employeeArr);
         let index2 = indexFinder(title, roleArr);
-        console.log(employee, title, index)
         connection.query(
             'UPDATE employee SET ? WHERE ?',
             [{
@@ -344,5 +336,5 @@ function updateEmployee() {
                 backMenu();
             }
         );
-    })
+    });
 }
